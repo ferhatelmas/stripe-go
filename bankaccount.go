@@ -20,19 +20,18 @@ type BankAccountStatus string
 type BankAccountParams struct {
 	Params `form:"*"`
 
-	Account string `form:"account_number"`
-
 	// AccountID is the identifier of the parent account under which bank
 	// accounts are nested.
 	AccountID string `form:"-"`
 
-	AccountHolderName string `form:"account_holder_name"`
-	AccountHolderType string `form:"account_holder_type"`
-	Country           string `form:"country"`
-	Currency          string `form:"currency"`
-	Customer          string `form:"-"`
-	Default           bool   `form:"default_for_currency"`
-	Routing           string `form:"routing_number"`
+	AccountHolderName  string `form:"account_holder_name"`
+	AccountHolderType  string `form:"account_holder_type"`
+	AccountNumber      string `form:"account_number"`
+	Country            string `form:"country"`
+	Currency           string `form:"currency"`
+	Customer           string `form:"-"`
+	DefaultForCurrency bool   `form:"default_for_currency"`
+	RoutingNumber      string `form:"routing_number"`
 
 	// Token is a token referencing an external account like one returned from
 	// Stripe.js.
@@ -65,13 +64,13 @@ func (a *BankAccountParams) AppendToAsSourceOrExternalAccount(body *form.Values)
 	if len(a.Token) > 0 {
 		body.Add(sourceType, a.Token)
 
-		if a.Default {
-			body.Add("default_for_currency", strconv.FormatBool(a.Default))
+		if a.DefaultForCurrency {
+			body.Add("default_for_currency", strconv.FormatBool(a.DefaultForCurrency))
 		}
 	} else {
 		body.Add(sourceType+"[object]", "bank_account")
 		body.Add(sourceType+"[country]", a.Country)
-		body.Add(sourceType+"[account_number]", a.Account)
+		body.Add(sourceType+"[account_number]", a.AccountNumber)
 		body.Add(sourceType+"[currency]", a.Currency)
 
 		// These are optional and the API will fail if we try to send empty
@@ -85,12 +84,12 @@ func (a *BankAccountParams) AppendToAsSourceOrExternalAccount(body *form.Values)
 			body.Add(sourceType+"[account_holder_type]", a.AccountHolderType)
 		}
 
-		if len(a.Routing) > 0 {
-			body.Add(sourceType+"[routing_number]", a.Routing)
+		if len(a.RoutingNumber) > 0 {
+			body.Add(sourceType+"[routing_number]", a.RoutingNumber)
 		}
 
-		if a.Default {
-			body.Add(sourceType+"[default_for_currency]", strconv.FormatBool(a.Default))
+		if a.DefaultForCurrency {
+			body.Add(sourceType+"[default_for_currency]", strconv.FormatBool(a.DefaultForCurrency))
 		}
 	}
 }
@@ -112,6 +111,7 @@ type BankAccountListParams struct {
 type BankAccount struct {
 	AccountHolderName  string            `json:"account_holder_name"`
 	AccountHolderType  string            `json:"account_holder_type"`
+	BankName           string            `json:"bank_name"`
 	Country            string            `json:"country"`
 	Currency           Currency          `json:"currency"`
 	Customer           *Customer         `json:"customer"`
@@ -121,7 +121,6 @@ type BankAccount struct {
 	ID                 string            `json:"id"`
 	Last4              string            `json:"last4"`
 	Metadata           map[string]string `json:"metadata"`
-	Name               string            `json:"bank_name"`
 	RoutingNumber      string            `json:"routing_number"`
 	Status             BankAccountStatus `json:"status"`
 }
