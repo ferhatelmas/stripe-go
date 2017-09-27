@@ -128,7 +128,7 @@ type BankAccount struct {
 // BankAccountList is a list object for bank accounts.
 type BankAccountList struct {
 	ListMeta
-	Values []*BankAccount `json:"data"`
+	Data []*BankAccount `json:"data"`
 }
 
 // UnmarshalJSON handles deserialization of a BankAccount.
